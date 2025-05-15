@@ -1,0 +1,32 @@
+
+.map-section {
+  padding: 20px;
+  margin-top: 53px;
+}
+
+.map-responsive {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 aspect ratio */
+  border-radius: 10px;
+  margin-top: 0px;
+}
+
+
+.map-responsive iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+ width: 100%;  /* ✅ instead of 90% */
+  height: 100%;
+  border: 0;
+  border-radius: 10px;
+}
+
+@media (max-width: 768px) {
+  .map-responsive {
+    padding-top: 60%; /* slightly taller map for mobile */
+    margin-top: 10px;  /* apply margin-top only on small screens */
+  }
+}

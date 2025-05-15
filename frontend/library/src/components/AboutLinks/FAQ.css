@@ -1,0 +1,59 @@
+.content {
+  color: #040404;
+}
+
+.accordions {
+  display: flex;
+  flex-direction: column;
+}
+
+.ques {
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+  padding: 8px 15px;
+  padding-right: 48px;
+  cursor: pointer;
+  border-top: 4px solid #fff;
+  border-bottom: 4px solid #fff;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  column-gap: 24px;
+  align-items: center;
+}
+
+.num {
+  font-size: 16px;
+  font-weight: 600;
+  color: #082037;
+}
+
+.titles {
+  font-size: 16px;
+  font-weight: 600;
+  color: #082037;
+}
+
+.content-box {
+  grid-column: 2 / -1;
+  line-height: 1.6;
+  text-align: justify;
+}
+
+.open {
+  border-top: 4px solid #050c52;
+}
+
+.open .num,
+.open .titles {
+  color: #0e0c50;
+}
+
+.opened-ques {
+  background-color: #050c52;
+  color: white;
+}
+
+.line-item {
+  margin-left: 20px;
+  font-size: 14px;
+  color: #333;
+}

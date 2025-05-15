@@ -1,0 +1,82 @@
+.back {
+  height: 580px;
+  width: 364px;
+  background-color: white;
+  text-align: center;
+}
+.Details {
+  color: white;
+  text-align: center;
+  background-color: #071653;
+  font-weight: 600;
+  font-size: 19px;
+}
+
+ .head {
+  padding-top: 1px;
+    font-weight: 600;
+    background-color: #071653;
+    color: white;
+    font-size: 18px;
+}
+
+.details-info p {
+  margin-top: 7px;
+  text-align: left;
+  font-size: 16px;
+  margin-left: 16px;
+  font-weight: 600 !important;
+  margin-bottom: 0px !important;
+  display: block !important;
+}
+
+h4 {
+  padding: 0px !important;
+  margin: 0px !important;
+}
+.cards-text {
+  font-size: 12px;
+  font-weight: 600;
+  text-align: justify;
+  text-align: center;
+  font-style: italic;
+  color: rgb(13, 35, 66);
+}
+.back .tail  {
+  font-size: 12px;
+  font-weight: 600;
+  text-align: justify;
+  text-align: center;
+  font-style: italic;
+  color: rgb(0, 0, 0);
+}
+.logo {
+  height: 60px;
+  width: 150px;
+  padding: 40px;
+}
+
+.uop {
+  height: 98px;
+  width: 364px;
+}
+.footer {
+  padding: 6px;
+  font-weight: 600;
+  text-align: center;
+  background-color: #071653;
+  color: white;
+  font-size: 14px;
+}
+.first-text{
+  margin-left: 2px;
+  margin-bottom: 12px;
+}
+
+.links{
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600 !important;
+  color: #071653;
+  margin-bottom: 6px;
+}

@@ -1,0 +1,42 @@
+/* Adjusting the animation for modal appearance */
+.modal-dialog {
+    transition: transform 0.5s ease-out;
+    transform: translateY(-100px); 
+  }
+  
+  .modal.show .modal-dialog {
+    transform: translateY(0); 
+  }
+  
+  .modal-dialog.custom-modal {
+    max-width: 500px;
+    width: 60% !important;
+    height: 200px;
+  }
+  
+  .modal-content{
+    background-color: #2e1a54;
+    color: white;
+  }
+
+  #checkIcon i {
+    margin-top: -40px;
+    background-color: #fff;
+    border-radius: 50%;
+    display: inline-block;
+    width: 100px; /* Increased width */
+    height: 100px; /* Increased height */
+    font-size: 64px;
+    line-height: 100px; /* Adjusted to center the icon */
+    box-shadow: 3px 5px 26px rgba(0, 0, 0, 0.3);
+  }
+  
+  .modal-body {
+    padding-top: 50px; /* Adjust padding for better positioning */
+  }
+  
+  button {
+    margin-top: 20px;
+    font-weight: bold;
+  }
+  
