@@ -10,7 +10,7 @@ function Messages() {
   }, []);
 
   const fetchMessageData = async () => {
-    const response = await axios.get("http://localhost:4000/message");
+    const response = await axios.get("http://localhost:4000/api/message");
     setMessageData(response.data);
     console.log(response.data);
   };

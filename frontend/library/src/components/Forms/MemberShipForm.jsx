@@ -145,7 +145,6 @@ export default function MemberShipForm() {
     setSubmitResult(null);
 
     try {
-      console.log("Attempting to send data to server...");
       const response = await axios.post(
         "http://localhost:4000/api/submit-form",
         formData,
@@ -155,7 +154,6 @@ export default function MemberShipForm() {
           },
         }
       );
-      console.log("Form submitted successfully:", response.data);
       setSubmitResult({
         type: "success",
         message: "Form submitted successfully!",

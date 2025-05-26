@@ -100,7 +100,7 @@ export default function BookPurchase() {
 
   const onSubmit = async (data) => {
     try {
-      await axios.post("http://localhost:4000/api/purchase", data);
+      await axios.post("http://localhost:4000/resources/insertPurchase", data);
       setIsModalVisible(true);
     } catch (error) {
       console.log("error in data purchase table", error);

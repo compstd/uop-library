@@ -1,4 +1,6 @@
 import "./Modal.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleCheck } from "@fortawesome/free-solid-svg-icons";
 
 const SuccessModal = ({ isVisible, onClose, onNavigate }) => {
   if (!isVisible) return null;
@@ -18,8 +20,13 @@ const SuccessModal = ({ isVisible, onClose, onNavigate }) => {
         <div className="modal-content">
           <div className="modal-body text-center">
             <div id="checkIcon">
-              <i className="text-success fa-solid fa-check-circle"></i>
+              <FontAwesomeIcon
+                icon={faCircleCheck}
+                className="text-success"
+                size="3x"
+              />
             </div>
+
             <div className="mt-4 py-2">
               <h2 className="px-4 pb-0 mb-1 text-center">Awesome</h2>
               <h6 className="h5">

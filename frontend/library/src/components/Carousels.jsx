@@ -16,6 +16,7 @@ export default function Carousels() {
       try {
         const response = await fetch("http://localhost:4000/api/images");
         const data = await response.json();
+        console.log(data);
         setImages(data);
       } catch (error) {
         console.error("Error fetching images:", error);

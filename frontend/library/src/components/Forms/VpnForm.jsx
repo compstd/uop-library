@@ -75,7 +75,7 @@ export default function VpnForm() {
 
   const onSubmit = async (data) => {
     try {
-      await axios.post("http://localhost:4000/api/resource", data);
+      await axios.post("http://localhost:4000/resources/insertResource", data);
       setIsModalVisible(true);
     } catch (error) {
       console.log("Error something form", error);

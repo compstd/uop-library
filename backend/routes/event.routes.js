@@ -48,4 +48,22 @@ router.post("/", upload.single("image"), async (req, res) => {
   }
 });
 
+router.get("/events", async (req, res) => {
+  const query = "SELECT * FROM events";
+
+  try {
+    const [result] = await db.execute(query);
+    const processedEvents = result.map((event) => ({
+      ...event,
+      event_img: event.event_img
+        ? `/uploads/${path.basename(event.event_img)}`
+        : null,
+    }));
+    res.json(processedEvents);
+  } catch (err) {
+    console.error("Error fetching events:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 module.exports = router;

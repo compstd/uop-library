@@ -54,9 +54,7 @@ function ThesisView() {
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(
-        `http://localhost:4000/api/thesis-submissions/delete/${id}`
-      );
+      await axios.delete(`http://localhost:4000/api/thesis-submissions/${id}`);
       setTheses(theses.filter((thesis) => thesis.id !== id));
     } catch (error) {
       console.error("Error deleting thesis:", error);
@@ -66,7 +64,7 @@ function ThesisView() {
   const handleDownload = async (id, title) => {
     try {
       const response = await axios.get(
-        `http://localhost:4000/api/thesis-download/${id}`,
+        `http://localhost:4000/api/thesis-submissions/download/${id}`,
         {
           responseType: "blob",
         }
@@ -89,7 +87,7 @@ function ThesisView() {
     setIsDownloading(true);
     try {
       const response = await axios.get(
-        "http://localhost:4000/api/thesis-submissions/excel",
+        "http://localhost:4000/api/thesis-submissions/download",
         {
           responseType: "blob",
         }

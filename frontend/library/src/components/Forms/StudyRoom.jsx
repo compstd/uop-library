@@ -120,7 +120,7 @@ export default function StudyRoom() {
 
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/thesis-submission",
+        "http://localhost:4000/api/thesis-submissions/submit",
         formData,
         {
           headers: {
@@ -129,8 +129,7 @@ export default function StudyRoom() {
           timeout: 30000,
         }
       );
-
-      alert(response.data.message || "Thesis submitted successfully!");
+      setIsModalVisible(true);
     } catch (error) {
       console.error("Submission error:", error);
 

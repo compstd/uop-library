@@ -12,17 +12,24 @@ function Student() {
   const limit = 5;
 
   useEffect(() => {
-    fetchStudents();
+    setStudents([]);
+    setPage(0);
+    setHasMore(true);
+    fetchStudents(0);
   }, []);
 
-  const fetchStudents = async () => {
+  const fetchStudents = async (currentPage) => {
     try {
       const response = await axios.get(
-        `http://localhost:4000/students?offset=${page * limit}&limit=${limit}`
+        `http://localhost:4000/students?offset=${
+          currentPage * limit
+        }&limit=${limit}`
       );
       setStudents(response.data);
       if (response.data.length < limit) {
         setHasMore(false);
+      } else {
+        setPage(currentPage + 1);
       }
     } catch (error) {
       console.error("Error fetching students:", error);
@@ -30,6 +37,8 @@ function Student() {
   };
 
   const fetchMoreData = async () => {
+    if (!hasMore) return;
+
     try {
       const response = await axios.get(
         `http://localhost:4000/students?offset=${page * limit}&limit=${limit}`
@@ -61,7 +70,12 @@ function Student() {
       dataLength={students.length}
       next={fetchMoreData}
       hasMore={hasMore}
-      loader="loading...."
+      loader={<h4>Loading...</h4>} // Better loader message
+      endMessage={
+        <p style={{ textAlign: "center" }}>
+          <b>Yay! You have seen it all</b>
+        </p>
+      } // Message when no more data
     >
       <div
         className="container-fluid"
@@ -105,7 +119,8 @@ function Student() {
                     searchValue === "" ? true : item.cnic.includes(searchValue)
                   )
                   .map((student) => (
-                    <tr key={student.Id}>
+                    <tr key={student.std_id}>
+                      {" "}
                       <td>{student.std_id}</td>
                       <td>{student.first_name}</td>
                       <td>{student.last_name}</td>
