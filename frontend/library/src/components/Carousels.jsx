@@ -7,23 +7,15 @@ import "swiper/css/navigation";
 import "./Carousels.css";
 
 export default function Carousels() {
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState([
+    {
+      id: 1,
+      path: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSn6UDT6D6U0ZzZ837x5nUEMXXJ1SjxUpkcBQ&s",
+      name: "student_pic",
+    },
+  ]);
   const progressCircle = useRef(null);
   const progressContent = useRef(null);
-
-  useEffect(() => {
-    async function fetchImages() {
-      try {
-        const response = await fetch("http://localhost:4000/api/images");
-        const data = await response.json();
-        console.log(data);
-        setImages(data);
-      } catch (error) {
-        console.error("Error fetching images:", error);
-      }
-    }
-    fetchImages();
-  }, []);
 
   const onAutoplayTimeLeft = (s, time, progress) => {
     progressCircle.current.style.setProperty("--progress", 1 - progress);

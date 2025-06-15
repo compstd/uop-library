@@ -1,33 +1,39 @@
 const mysql = require("mysql2");
 
-const isProd = false;
+const isProd = process.env.NODE_ENV === "production";
 
 const dbConfig = isProd
   ? {
-      host: "your-hosting-db-host", // e.g., "mysql.uoplibrary.com"
-      user: "your-prod-username", // Your hosting DB username
-      password: "your-prod-password", // Your hosting DB password
-      database: "admin",
+      // Production PlanetScale config
+      host: "aws.connect.psdb.cloud",
+      user: "uhmgjk6elfwax15wuija",
+      password: "pscale_pw_ztLngXHhHbSQvLoTn8rlegKwJstmEOU0y2paZLQAzHU",
+      database: "uop_library",
+      ssl: {
+        rejectUnauthorized: true,
+      },
       waitForConnections: true,
       queueLimit: 0,
       connectionLimit: 10,
       maxPreparedStatements: 100,
       enableKeepAlive: true,
       charset: "utf8mb4",
-      maxAllowedPacket: "16M",
     }
   : {
-      host: "localhost",
-      user: "root",
-      password: "",
-      database: "admin",
+      // Development PlanetScale config (same as production)
+      host: "aws.connect.psdb.cloud",
+      user: "uhmgjk6elfwax15wuija",
+      password: "pscale_pw_ztLngXHhHbSQvLoTn8rlegKwJstmEOU0y2paZLQAzHU",
+      database: "uop_library",
+      ssl: {
+        rejectUnauthorized: true,
+      },
       waitForConnections: true,
       queueLimit: 0,
       connectionLimit: 10,
       maxPreparedStatements: 100,
       enableKeepAlive: true,
       charset: "utf8mb4",
-      maxAllowedPacket: "16M",
     };
 
 const db = mysql.createPool(dbConfig);
