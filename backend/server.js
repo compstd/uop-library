@@ -31,16 +31,15 @@ const port = process.env.PORT || 4000;
 const isProduction = process.env.NODE_ENV === "production";
 
 if (isProduction) {
-  app.use(
-    cors({
-      origin: [
-        "https://your-admin-app.onrender.com",
-        "https://your-library-app.onrender.com",
-        "https://uoplibrary.com",
-      ],
-      credentials: true,
-    })
-  );
+  app.use(cors({
+  origin: [
+    'https://uop-library.onrender.com',
+    'https://uop-admin.onrender.com',
+    'http://localhost:5173', // Local development
+    'http://localhost:5174'  // Local development
+  ],
+  credentials: true
+}));
 } else {
   app.use(
     cors({
