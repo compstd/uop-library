@@ -9,9 +9,9 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+    const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
  useEffect(() => {
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
-   console.log(API_BASE_URL);
 
   const checkAuth = async () => {
     try {
@@ -38,8 +38,6 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     setLoading(true);
-
-      const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
    console.log(API_BASE_URL);
     try {
             const res = await axios.get(`${API_BASE_URL}/auth/login`, {
