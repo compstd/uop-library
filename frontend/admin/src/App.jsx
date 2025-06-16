@@ -161,11 +161,11 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/Login" element={<Login />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/registration" element={<Registration />} />
         <Route
           path="*"
-          element={<h1>404! Page Not found. Check Page Name.</h1>}
+          element={<h1>404! Page Not Found. Check Page Name.</h1>}
         />
       </Routes>
     </AuthProvider>
