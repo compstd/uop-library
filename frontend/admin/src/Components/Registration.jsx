@@ -11,6 +11,9 @@ function Registration() {
 
 const handleSubmit = async (event) => {
   event.preventDefault();
+
+      const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
   try {
     const res = await axios.post(
       `${API_BASE_URL}/auth/register`,
