@@ -27,15 +27,20 @@ router.post("/img", upload.single("image"), async (req, res) => {
   }
 });
 
-router.get("/img", async (req, res) => {
+router.post("/img", upload.single("image"), async (req, res) => {
+  const imgName = req.file.filename;
+  const imgPath = `/uploads/${imgName}`; // ✅ Only relative path
+
+  const query = "INSERT INTO images (name, path) VALUES (?, ?)";
   try {
-    const [rows] = await db.execute("SELECT id, name, path FROM images");
-    res.json(rows);
+    await db.execute(query, [imgName, imgPath]);
+    res.send("Image uploaded successfully");
   } catch (err) {
-    console.error("Error fetching images:", err);
-    res.status(500).send("Error fetching images");
+    console.error("Error uploading image:", err);
+    res.status(500).send("Error uploading image");
   }
 });
+
 
 router.post("/", upload.single("image"), async (req, res) => {
   const { title, description, time, date } = req.body;
