@@ -18,52 +18,52 @@ function Student() {
     fetchStudents(0);
   }, []);
 
-  const fetchStudents = async (currentPage) => {
-    try {
-      const response = await axios.get(
-        `http://localhost:4000/students?offset=${
-          currentPage * limit
-        }&limit=${limit}`
-      );
-      setStudents(response.data);
-      if (response.data.length < limit) {
-        setHasMore(false);
-      } else {
-        setPage(currentPage + 1);
-      }
-    } catch (error) {
-      console.error("Error fetching students:", error);
+   const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+
+const fetchStudents = async (currentPage) => {
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/students?offset=${currentPage * limit}&limit=${limit}`
+    );
+    setStudents(response.data);
+    if (response.data.length < limit) {
+      setHasMore(false);
+    } else {
+      setPage(currentPage + 1);
     }
-  };
+  } catch (error) {
+    console.error("Error fetching students:", error);
+  }
+};
 
-  const fetchMoreData = async () => {
-    if (!hasMore) return;
+const fetchMoreData = async () => {
+  if (!hasMore) return;
 
-    try {
-      const response = await axios.get(
-        `http://localhost:4000/students?offset=${page * limit}&limit=${limit}`
-      );
-      setStudents((prevData) => [...prevData, ...response.data]);
-      if (response.data.length < limit) {
-        setHasMore(false);
-      }
-      setPage((prevPage) => prevPage + 1);
-    } catch (error) {
-      console.error("Error fetching more students:", error);
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/students?offset=${page * limit}&limit=${limit}`
+    );
+    setStudents((prevData) => [...prevData, ...response.data]);
+    if (response.data.length < limit) {
+      setHasMore(false);
     }
-  };
+    setPage((prevPage) => prevPage + 1);
+  } catch (error) {
+    console.error("Error fetching more students:", error);
+  }
+};
 
-  const handleDelete = async (id) => {
-    const confirmDelete = window.confirm("Are you sure to delete it?");
-    if (!confirmDelete) return;
+const handleDelete = async (id) => {
+  const confirmDelete = window.confirm("Are you sure to delete it?");
+  if (!confirmDelete) return;
 
-    try {
-      await axios.delete(`http://localhost:4000/students/delete/${id}`);
-      setStudents(students.filter((student) => student.std_id !== id));
-    } catch (error) {
-      console.error("Error deleting student:", error);
-    }
-  };
+  try {
+    await axios.delete(`${API_BASE_URL}/students/delete/${id}`);
+    setStudents(students.filter((student) => student.std_id !== id));
+  } catch (error) {
+    console.error("Error deleting student:", error);
+  }
+};
 
   return (
     <InfiniteScroll
