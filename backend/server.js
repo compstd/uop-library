@@ -5,6 +5,10 @@ const path = require("path");
 const db = require("./config/db.config.js");
 require("dotenv").config();
 
+// Define isProduction at the top
+const isProduction = process.env.NODE_ENV === 'production';
+
+// Test database connection
 db.execute("SHOW TABLES")
   .then(([rows]) => {
     console.log("Database connected! Tables:", rows);
@@ -13,6 +17,7 @@ db.execute("SHOW TABLES")
     console.error("Database connection failed:", err);
   });
 
+// Import all your route modules
 const upload = require("./config/multer.config.js");
 const uploads = require("./config/multer.config2.js");
 const authRoutes = require("./routes/auth.routes");
@@ -26,8 +31,10 @@ const formRoutes = require("./routes/form.routes");
 
 const app = express();
 
-const port = process.env.PORT;
+// Set port with fallback
+const port = process.env.PORT || 10000;
 
+// CORS configuration
 app.use(cors({
   origin: [
     'https://uop-library.onrender.com',
@@ -44,13 +51,29 @@ app.use(cors({
 
 // Handle preflight requests
 app.options('*', cors());
+
+// Middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // Add this for form data
 app.use(cookieParser());
 
+// Static files
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
+// Debug middleware (optional - remove in production if needed)
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path} - Origin: ${req.get('Origin')}`);
+  next();
+});
+
+// Test routes
 app.get('/api/test', (req, res) => {
-  res.json({ message: 'Backend is working!', cors: 'enabled' });
+  res.json({ 
+    message: 'Backend is working!', 
+    cors: 'enabled',
+    environment: isProduction ? 'production' : 'development',
+    port: port
+  });
 });
 
 app.get("/health", (req, res) => {
@@ -59,9 +82,11 @@ app.get("/health", (req, res) => {
     message: "Server is running",
     environment: isProduction ? "production" : "development",
     timestamp: new Date().toISOString(),
+    port: port
   });
 });
 
+// API Routes
 app.use("/auth", authRoutes);
 app.use("/students", studentRoutes);
 app.use("/resources", resourceRoutes);
@@ -70,6 +95,7 @@ app.use("/api/thesis-submissions", thesisRoutes);
 app.use("/api", basicRoutes);
 app.use("/api", formRoutes);
 
+// Error handling middleware
 app.use((err, req, res, next) => {
   console.error("Error occurred:", err.stack);
   res.status(500).json({
@@ -78,16 +104,18 @@ app.use((err, req, res, next) => {
   });
 });
 
+// 404 handler
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
+// Start server
 app.listen(port, "0.0.0.0", () => {
   console.log(
     `🚀 Server is running on Port ${port} in ${
       isProduction ? "production" : "development"
     } mode`
   );
-  console.log(`📍 Server URL: http://localhost:${port}`);
-  console.log(`🔗 Health Check: http://localhost:${port}/health`);
+  console.log(`📍 Server URL: http://0.0.0.0:${port}`);
+  console.log(`🔗 Health Check: http://0.0.0.0:${port}/health`);
 });
