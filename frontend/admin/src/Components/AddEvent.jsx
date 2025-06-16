@@ -4,6 +4,8 @@ import axios from "axios";
 
 function AddEvent() {
   const navigate = useNavigate();
+  const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 
   const [values, setValues] = useState({
     id: "",
@@ -29,13 +31,13 @@ function AddEvent() {
     formData.append("image", values.image);
 
     try {
-      await axios.post("http://localhost:4000/events/", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      navigate("/admin/Events");
-    } catch (error) {
+  await axios.post(`${API_BASE_URL}/events/`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  navigate("/Events");
+} catch (error) {
       console.error("Error uploading event data:", error);
     }
   };
