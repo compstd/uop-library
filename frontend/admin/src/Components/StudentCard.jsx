@@ -6,32 +6,35 @@ function StudentCard() {
   const [students, setStudents] = useState([])
   const { cnic } = useParams()
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const studentResponse = await axios.get(
-          `http://localhost:4000/students/${cnic}`,
-        )
-        setStudents(studentResponse.data)
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
+  const API_BASE_URL = import.meta.env.VITE_API_URL;
+
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const studentResponse = await axios.get(
+        `${API_BASE_URL}/students/${cnic}`
+      );
+      setStudents(studentResponse.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
     }
+  };
 
-    fetchData()
-  }, [cnic])
+  fetchData();
+}, [cnic]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await axios.put(`http://localhost:4000/students/${cnic}`)
-      } catch (error) {
-        console.error('Error updating status:', error)
-      }
+useEffect(() => {
+  const updateStatus = async () => {
+    try {
+      await axios.put(`${API_BASE_URL}/students/${cnic}`);
+    } catch (error) {
+      console.error("Error updating status:", error);
     }
+  };
 
-    fetchData()
-  }, [cnic])
+  updateStatus();
+}, [cnic]);
+
 
   return (
     <div className='container-fluid'>
