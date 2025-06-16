@@ -131,44 +131,45 @@ export default function MemberShipForm() {
   });
 
   const onSubmit = async (data) => {
-    const formData = new FormData();
-
-    Object.keys(data).forEach((key) => {
-      formData.append(key, data[key]);
+  const formData = new FormData();
+  Object.keys(data).forEach((key) => {
+    formData.append(key, data[key]);
+  });
+  if (image) {
+    formData.append("image", image);
+  }
+  setIsSubmitting(true);
+  setSubmitResult(null);
+  
+  try {
+    // Use environment variable instead of hardcoded localhost
+    const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+    
+    const response = await axios.post(
+      `${API_BASE_URL}/api/submit-form`, // Changed this line
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true, // Add this for CORS
+      }
+    );
+    setSubmitResult({
+      type: "success",
+      message: "Form submitted successfully!",
     });
-
-    if (image) {
-      formData.append("image", image);
-    }
-
-    setIsSubmitting(true);
-    setSubmitResult(null);
-
-    try {
-      const response = await axios.post(
-        "http://localhost:4000/api/submit-form",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      setSubmitResult({
-        type: "success",
-        message: "Form submitted successfully!",
-      });
-      setIsModalVisible(true);
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      setSubmitResult({
-        type: "error",
-        message: "Error submitting form. Please try again.",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    setIsModalVisible(true);
+  } catch (error) {
+    console.error("Error submitting form:", error);
+    setSubmitResult({
+      type: "error",
+      message: "Error submitting form. Please try again.",
+    });
+  } finally {
+    setIsSubmitting(false);
+  }
+};
   return (
     <>
       <h4 style={{ marginTop: "19px", marginBottom: "58px" }}>
