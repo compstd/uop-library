@@ -9,23 +9,33 @@ function Registration() {
 
   const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    axios
-      .post("http://localhost:4000/auth/register", {
+const handleSubmit = async (event) => {
+  event.preventDefault();
+  try {
+    const res = await axios.post(
+      `${API_BASE_URL}/auth/register`,
+      {
         username,
         email,
         password,
-      })
-      .then((res) => {
-        if (res.status === 200) {
-          navigate("/admin/login");
-        } else {
-          alert("Error during Registring");
-        }
-      })
-      .then((err) => console.log(err));
-  };
+      },
+      {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (res.status === 200) {
+      navigate("/admin/login");
+    } else {
+      alert("Error during registering");
+    }
+  } catch (err) {
+    console.error("Registration error:", err);
+  }
+};
 
   return (
     <div className="container-fluid bg-dark vh-100">
