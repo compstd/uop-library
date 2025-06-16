@@ -4,7 +4,7 @@ import Sidebar from "./Sidebar";
 import axios from "axios";
 function Events() {
   const [EventData, setEventData] = useState([]);
-  const baseURL = "http://localhost:4000";
+  const baseURL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     fetchEventData();
