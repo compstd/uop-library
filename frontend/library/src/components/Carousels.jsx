@@ -60,7 +60,7 @@ export default function Carousels() {
       >
         {images.map((img) => (
           <SwiperSlide key={img.id}>
-            <img src={`${API_BASE_URL}/${img.path}`} alt={img.name} />
+<img src={`${API_BASE_URL}${img.path}`} alt={img.name} />
           </SwiperSlide>
         ))}
         <div className="autoplay-progress" slot="container-end">
