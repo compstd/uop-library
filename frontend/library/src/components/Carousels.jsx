@@ -5,15 +5,12 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 import "./Carousels.css";
+import axios from "axios";
+
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 export default function Carousels() {
-  const [images, setImages] = useState([
-    {
-      id: 1,
-      path: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSn6UDT6D6U0ZzZ837x5nUEMXXJ1SjxUpkcBQ&s",
-      name: "student_pic",
-    },
-  ]);
+  const [images, setImages] = useState([]);
   const progressCircle = useRef(null);
   const progressContent = useRef(null);
 
@@ -21,6 +18,19 @@ export default function Carousels() {
     progressCircle.current.style.setProperty("--progress", 1 - progress);
     progressContent.current.textContent = `${Math.ceil(time / 1000)}s`;
   };
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/events/img`);
+        setImages(response.data);
+      } catch (err) {
+        console.error("Error fetching images:", err);
+      }
+    };
+
+    fetchImages();
+  }, []);
 
   return (
     <>
@@ -50,7 +60,7 @@ export default function Carousels() {
       >
         {images.map((img) => (
           <SwiperSlide key={img.id}>
-            <img src={`http://localhost:4000${img.path}`} alt={img.name} />
+            <img src={`${API_BASE_URL}/${img.path}`} alt={img.name} />
           </SwiperSlide>
         ))}
         <div className="autoplay-progress" slot="container-end">
