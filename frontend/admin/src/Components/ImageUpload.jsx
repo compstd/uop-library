@@ -6,6 +6,9 @@ const ImageUpload = () => {
   const [image, setImage] = useState(null);
   const navigate = useNavigate();
 
+  const API_BASE_URL = import.meta.env.VITE_API_URL;
+
+  
   const handleImageChange = (e) => {
     setImage(e.target.files[0]);
     console.log(e.target.files[0]);
@@ -16,15 +19,15 @@ const ImageUpload = () => {
     const formData = new FormData();
     formData.append("image", image);
 
-    try {
-      axios.post("http://localhost:4000/events/img", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      alert("Change sucessfully");
-      navigate("/admin");
-    } catch (error) {
+   try {
+  await axios.post(`${API_BASE_URL}/events/img`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  alert("Change successfully");
+  navigate("/");
+} catch (error) {
       console.error("Error uploading image:", error);
     }
   };
