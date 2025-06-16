@@ -2,11 +2,9 @@ const mysql = require("mysql2");
 
 const isProd = process.env.NODE_ENV === "production";
 
-// Parse DATABASE_URL if provided, otherwise use individual env vars
 let dbConfig;
 
 if (process.env.DATABASE_URL) {
-  // Parse the DATABASE_URL for PlanetScale
   const url = new URL(process.env.DATABASE_URL);
   dbConfig = {
     host: url.hostname,
