@@ -28,9 +28,7 @@ function App() {
         <Route
           path="/"
           element={
-            <ProtectedRoute>
               <Hero />
-            </ProtectedRoute>
           }
         />
         <Route
