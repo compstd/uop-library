@@ -95,6 +95,16 @@ app.use("/api/thesis-submissions", thesisRoutes);
 app.use("/api", basicRoutes);
 app.use("/api", formRoutes);
 
+app.get("/users", async (req, res) => {
+  try {
+    const [rows] = await db.execute("SELECT * FROM login");
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching users", error: err.message });
+  }
+});
+
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error("Error occurred:", err.stack);
