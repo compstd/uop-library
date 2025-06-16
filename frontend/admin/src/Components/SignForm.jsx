@@ -7,33 +7,35 @@ const SignForm = () => {
   const [students, setStudents] = useState([]);
   const { cnic } = useParams();
 
-  const controller = new AbortController();
+const API_BASE_URL = "https://library-backend-q8p3.onrender.com";
 
-  const signal = controller.signal;
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const studentResponse = await axios.get(
-          `http://localhost:4000/students/${cnic}`,
-          { signal }
-        );
-        setStudents(studentResponse.data);
-        console.log(`Student data fetched successfully for CNIC: ${cnic}`);
-      } catch (error) {
-        if (axios.isCancel(error)) {
-          console.log("Fetch request canceled:", error.message);
-        } else {
-          console.error("Error fetching data:", error);
-        }
+useEffect(() => {
+  const controller = new AbortController(); 
+  const { signal } = controller;
+
+  const fetchData = async () => {
+    try {
+      const studentResponse = await axios.get(
+        `${API_BASE_URL}/students/${cnic}`,
+        { signal }
+      );
+      setStudents(studentResponse.data);
+      console.log(`Student data fetched successfully for CNIC: ${cnic}`);
+    } catch (error) {
+      if (axios.isCancel(error)) {
+        console.log("Fetch request canceled:", error.message);
+      } else {
+        console.error("Error fetching data:", error);
       }
-    };
+    }
+  };
 
-    fetchData();
+  fetchData();
 
-    return () => {
-      controller.abort();
-    };
-  }, [cnic]);
+  return () => {
+    controller.abort(); // cleanup on unmount
+  };
+}, [cnic]);
 
   return <StudentForm students={students} />;
 };
