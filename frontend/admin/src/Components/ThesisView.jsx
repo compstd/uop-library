@@ -16,100 +16,94 @@ function ThesisView() {
     fetchTheses();
   }, []);
 
-  const fetchTheses = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:4000/api/thesis-submissions?offset=${
-          page * limit
-        }&limit=${limit}`
-      );
-      setTheses(response.data);
-      if (response.data.length < limit) {
-        setHasMore(false);
-      }
-    } catch (error) {
-      console.error("Error fetching theses:", error);
+ const API_BASE_URL = import.meta.env.VITE_API_URL;
+
+const fetchTheses = async () => {
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/api/thesis-submissions?offset=${page * limit}&limit=${limit}`
+    );
+    setTheses(response.data);
+    if (response.data.length < limit) {
+      setHasMore(false);
     }
-  };
+  } catch (error) {
+    console.error("Error fetching theses:", error);
+  }
+};
 
-  const fetchMoreData = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:4000/api/thesis-submissions?offset=${
-          page * limit
-        }&limit=${limit}`
-      );
-      setTheses((prevData) => [...prevData, ...response.data]);
-      if (response.data.length < limit) {
-        setHasMore(false);
-      }
-      setPage((prevPage) => prevPage + 1);
-    } catch (error) {
-      console.error("Error fetching more theses:", error);
+const fetchMoreData = async () => {
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/api/thesis-submissions?offset=${page * limit}&limit=${limit}`
+    );
+    setTheses((prevData) => [...prevData, ...response.data]);
+    if (response.data.length < limit) {
+      setHasMore(false);
     }
-  };
+    setPage((prevPage) => prevPage + 1);
+  } catch (error) {
+    console.error("Error fetching more theses:", error);
+  }
+};
 
-  const handleDelete = async (id) => {
-    const confirmDelete = window.confirm("Are you sure to delete this thesis?");
-    if (!confirmDelete) return;
+const handleDelete = async (id) => {
+  const confirmDelete = window.confirm("Are you sure to delete this thesis?");
+  if (!confirmDelete) return;
 
-    try {
-      await axios.delete(`http://localhost:4000/api/thesis-submissions/${id}`);
-      setTheses(theses.filter((thesis) => thesis.id !== id));
-    } catch (error) {
-      console.error("Error deleting thesis:", error);
-    }
-  };
+  try {
+    await axios.delete(`${API_BASE_URL}/api/thesis-submissions/${id}`);
+    setTheses((prev) => prev.filter((thesis) => thesis.id !== id));
+  } catch (error) {
+    console.error("Error deleting thesis:", error);
+  }
+};
 
-  const handleDownload = async (id, title) => {
-    try {
-      const response = await axios.get(
-        `http://localhost:4000/api/thesis-submissions/download/${id}`,
-        {
-          responseType: "blob",
-        }
-      );
+const handleDownload = async (id, title) => {
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/api/thesis-submissions/download/${id}`,
+      { responseType: "blob" }
+    );
 
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", `${title}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode.removeChild(link);
-    } catch (error) {
-      console.error("Error downloading thesis:", error);
-      alert("Error downloading thesis");
-    }
-  };
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `${title}.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    link.parentNode.removeChild(link);
+  } catch (error) {
+    console.error("Error downloading thesis:", error);
+    alert("Error downloading thesis");
+  }
+};
 
-  const handleExcelDownload = async () => {
-    setIsDownloading(true);
-    try {
-      const response = await axios.get(
-        "http://localhost:4000/api/thesis-submissions/download",
-        {
-          responseType: "blob",
-        }
-      );
+const handleExcelDownload = async () => {
+  setIsDownloading(true);
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/api/thesis-submissions/download`,
+      { responseType: "blob" }
+    );
 
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute(
-        "download",
-        `thesis_submissions_${new Date().toISOString().split("T")[0]}.xlsx`
-      );
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode.removeChild(link);
-    } catch (error) {
-      console.error("Error downloading excel:", error);
-      alert("Error downloading excel file");
-    } finally {
-      setIsDownloading(false);
-    }
-  };
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute(
+      "download",
+      `thesis_submissions_${new Date().toISOString().split("T")[0]}.xlsx`
+    );
+    document.body.appendChild(link);
+    link.click();
+    link.parentNode.removeChild(link);
+  } catch (error) {
+    console.error("Error downloading excel:", error);
+    alert("Error downloading excel file");
+  } finally {
+    setIsDownloading(false);
+  }
+};
 
   return (
     <InfiniteScroll
