@@ -9,39 +9,34 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-    const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
- useEffect(() => {
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/auth/protected`, {
+          withCredentials: true,
+        });
 
-  const checkAuth = async () => {
-    try {
-      const res = await axios.get(`${API_BASE_URL}/auth/protected`, {
-        withCredentials: true,
-      });
-      if (res.status === 200) {
-        setIsAuthenticated(true);
+        if (res.status === 200) {
+          setIsAuthenticated(true);
+        }
+      } catch (err) {
+        setIsAuthenticated(false);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setIsAuthenticated(false);
-      const publicRoutes = ["/login", "/registration"];
-      if (!publicRoutes.includes(window.location.pathname)) {
-        navigate("/login");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  checkAuth();
-}, [navigate]);
-
+    checkAuth();
+  }, []);
 
   const login = async (email, password) => {
-    setLoading(true);
-   console.log(API_BASE_URL);
     try {
-            const res = await axios.post(`${API_BASE_URL}/auth/login`, {
-          email, password },
+      setLoading(true);
+      const res = await axios.post(
+        `${API_BASE_URL}/auth/login`,
+        { email, password },
         { withCredentials: true }
       );
 
@@ -50,7 +45,6 @@ export const AuthProvider = ({ children }) => {
         navigate("/");
       }
     } catch (err) {
-      console.error("Login failed:", err);
       alert(
         err.response?.data?.message ||
           "Login failed! Please check your credentials."
@@ -62,11 +56,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.post(
-        "http://localhost:4000/auth/logout",
-        {},
-        { withCredentials: true }
-      );
+      await axios.post(`${API_BASE_URL}/auth/logout`, {}, { withCredentials: true });
     } catch (err) {
       console.error("Logout failed:", err);
     } finally {
@@ -75,21 +65,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
+  return useContext(AuthContext);
 };
