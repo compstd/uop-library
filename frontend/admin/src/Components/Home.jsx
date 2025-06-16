@@ -9,30 +9,33 @@ function Home({ Toggle }) {
     totalThesis: 0,
   });
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const studentsResponse = await fetch(
-          "http://localhost:4000/api/dashboard-data"
-        );
-        const studentsData = await studentsResponse.json();
+ const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
-        const thesisResponse = await fetch(
-          "http://localhost:4000/api/thesis-dashboard-data"
-        );
-        const thesisData = await thesisResponse.json();
+useEffect(() => {
+  const fetchDashboardData = async () => {
+    try {
+      const studentsResponse = await fetch(
+        `${API_BASE_URL}/api/dashboard-data`
+      );
+      const studentsData = await studentsResponse.json();
 
-        setDashboardData({
-          ...studentsData,
-          totalThesis: thesisData.totalThesis,
-        });
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-      }
-    };
+      const thesisResponse = await fetch(
+        `${API_BASE_URL}/api/thesis-dashboard-data`
+      );
+      const thesisData = await thesisResponse.json();
 
-    fetchDashboardData();
-  }, []);
+      setDashboardData({
+        ...studentsData,
+        totalThesis: thesisData.totalThesis,
+      });
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+    }
+  };
+
+  fetchDashboardData();
+}, []);
+
 
   return (
     <div className="px-3">
