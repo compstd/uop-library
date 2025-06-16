@@ -38,10 +38,12 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     setLoading(true);
+
+      const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+   console.log(API_BASE_URL);
     try {
-      const res = await axios.post(
-        "http://localhost:4000/auth/login",
-        { email, password },
+            const res = await axios.get(`${API_BASE_URL}/auth/login`, {
+          email, password },
         { withCredentials: true }
       );
 
