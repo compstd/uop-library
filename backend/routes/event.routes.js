@@ -27,6 +27,16 @@ router.post("/img", upload.single("image"), async (req, res) => {
   }
 });
 
+router.get("/img", async (req, res) => {
+  try {
+    const [rows] = await db.execute("SELECT id, name, path FROM images");
+    res.json(rows);
+  } catch (err) {
+    console.error("Error fetching images:", err);
+    res.status(500).send("Error fetching images");
+  }
+});
+
 router.post("/", upload.single("image"), async (req, res) => {
   const { title, description, time, date } = req.body;
   const relativePath = req.file ? `/uploads/${req.file.filename}` : null;
