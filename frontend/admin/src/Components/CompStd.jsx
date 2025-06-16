@@ -10,31 +10,33 @@ function CompStd() {
     fetchStudents();
   }, []);
 
-  const fetchStudents = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:4000/students/getstudents`
-      );
-      setStudents(response.data);
-      if (response.data.length < 0) {
-        setHasMore(false);
-      }
-    } catch (error) {
-      console.error("Error fetching students:", error);
-    }
-  };
+ const API_BASE_URL = import.meta.env.VITE_API_URL;
 
-  const handleDelete = async (id) => {
-    const confirmDelete = window.confirm("Are you sure to delete it?");
-    if (!confirmDelete) return;
-
-    try {
-      await axios.delete(`http://localhost:4000/students/delete/${id}`);
-      setStudents(students.filter((student) => student.std_id !== id));
-    } catch (error) {
-      console.error("Error deleting student:", error);
+const fetchStudents = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/students/getstudents`);
+    setStudents(response.data);
+    if (response.data.length <= 0) {
+      setHasMore(false);
     }
-  };
+  } catch (error) {
+    console.error("Error fetching students:", error);
+  }
+};
+
+const handleDelete = async (id) => {
+  const confirmDelete = window.confirm("Are you sure to delete it?");
+  if (!confirmDelete) return;
+
+  try {
+    await axios.delete(`${API_BASE_URL}/students/delete/${id}`);
+    setStudents((prevStudents) =>
+      prevStudents.filter((student) => student.std_id !== id)
+    );
+  } catch (error) {
+    console.error("Error deleting student:", error);
+  }
+};
 
   return (
     <div
