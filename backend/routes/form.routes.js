@@ -8,72 +8,87 @@ const router = express.Router();
 // POST /api/submit-form
 router.post("/submit-form", uploadMemory.single("image"), async (req, res) => {
   const {
-    fname,
-    lname,
-    fathername,
-    department,
-    semester,
-    PAddress,
-    email,
-    phone,
-    nic,
-    dob,
-    status,
-    designation,
-    issue,
-    expire,
+    fname, lname, fathername, department, semester, PAddress,
+    email, phone, nic, dob, status, designation, issue, expire,
   } = req.body;
-
+  
   const image = req.file ? req.file.buffer : null;
-
-  const connection = await db.getConnection();
-
-  try {
-    await connection.beginTransaction();
-
-    const [studentResult] = await connection.execute(
-      `INSERT INTO students 
-      (first_name, last_name, father_name, cnic, dob, phone, email, address, type, status, image) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        fname,
-        lname,
-        fathername,
-        nic,
-        dob,
-        phone,
-        email,
-        PAddress,
-        designation,
-        status,
-        image,
-      ]
-    );
-
-    const studentId = studentResult.insertId;
-
-    await connection.execute(
-      "INSERT INTO student_programs (student_id, program, semester) VALUES (?, ?, ?)",
-      [studentId, department, semester]
-    );
-
-    await connection.execute(
-      "INSERT INTO card_table (student_id, issue_date, expirey_date) VALUES (?, ?, ?)",
-      [studentId, issue, expire]
-    );
-
-    await connection.commit();
-
-    res.json({ message: "Form submitted successfully" });
-  } catch (error) {
-    await connection.rollback();
-    console.error("❌ Error submitting form:", error);
-    res.status(500).json({ error: "Internal Server Error. Please try again later." });
-  } finally {
-    connection.release();
+  
+  let connection;
+  let retries = 3;
+  
+  while (retries > 0) {
+    try {
+      connection = await db.getConnection();
+      
+      // Test the connection first
+      await connection.execute('SELECT 1');
+      
+      await connection.beginTransaction();
+      
+      const [studentResult] = await connection.execute(
+        `INSERT INTO students 
+        (first_name, last_name, father_name, cnic, dob, phone, email, address, type, status, image) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [fname, lname, fathername, nic, dob, phone, email, PAddress, designation, status, image]
+      );
+      
+      const studentId = studentResult.insertId;
+      
+      await connection.execute(
+        "INSERT INTO student_programs (student_id, program, semester) VALUES (?, ?, ?)",
+        [studentId, department, semester]
+      );
+      
+      await connection.execute(
+        "INSERT INTO card_table (student_id, issue_date, expirey_date) VALUES (?, ?, ?)",
+        [studentId, issue, expire]
+      );
+      
+      await connection.commit();
+      res.json({ message: "Form submitted successfully" });
+      break; // Success, exit retry loop
+      
+    } catch (error) {
+      console.error(`❌ Error submitting form (attempt ${4 - retries}):`, error);
+      
+      if (connection) {
+        try {
+          await connection.rollback();
+        } catch (rollbackError) {
+          console.error("Rollback error:", rollbackError);
+        }
+      }
+      
+      // Check if it's a connection-related error
+      if (error.code === 'PROTOCOL_CONNECTION_LOST' || 
+          error.code === 'ECONNRESET' || 
+          error.code === 'ER_SERVER_SHUTDOWN' ||
+          error.message.includes('Connection lost')) {
+        
+        retries--;
+        if (retries > 0) {
+          console.log(`Retrying connection... ${retries} attempts remaining`);
+          await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+          continue;
+        }
+      } else {
+        // Non-connection error, don't retry
+        retries = 0;
+      }
+      
+      if (retries === 0) {
+        res.status(500).json({ 
+          error: "Database connection failed. Please try again later." 
+        });
+      }
+    } finally {
+      if (connection) {
+        connection.release();
+      }
+    }
   }
 });
-
 // GET /api/images
 router.get("/images", async (req, res) => {
   const query = "SELECT id, name, path FROM images WHERE 1";
