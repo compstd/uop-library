@@ -31,8 +31,10 @@ router.post("/submit-form", uploadMemory.single("image"), async (req, res) => {
   try {
     await connection.beginTransaction();
 
-    const [studentResult] = await connection.query(
-      "INSERT INTO students (first_name, last_name, father_name, cnic, dob, phone, email, address, type, status, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    const [studentResult] = await connection.execute(
+      `INSERT INTO students 
+      (first_name, last_name, father_name, cnic, dob, phone, email, address, type, status, image) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         fname,
         lname,
@@ -50,22 +52,23 @@ router.post("/submit-form", uploadMemory.single("image"), async (req, res) => {
 
     const studentId = studentResult.insertId;
 
-    await connection.query(
+    await connection.execute(
       "INSERT INTO student_programs (student_id, program, semester) VALUES (?, ?, ?)",
       [studentId, department, semester]
     );
 
-    await connection.query(
+    await connection.execute(
       "INSERT INTO card_table (student_id, issue_date, expirey_date) VALUES (?, ?, ?)",
       [studentId, issue, expire]
     );
 
     await connection.commit();
+
     res.json({ message: "Form submitted successfully" });
   } catch (error) {
     await connection.rollback();
-    console.error("Error submitting form:", error);
-    res.status(500).json({ error: "Error submitting form" });
+    console.error("❌ Error submitting form:", error);
+    res.status(500).json({ error: "Internal Server Error. Please try again later." });
   } finally {
     connection.release();
   }
