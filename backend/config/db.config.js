@@ -1,9 +1,7 @@
 const mysql = require("mysql2");
-
 const isProd = process.env.NODE_ENV === "production";
 
 let dbConfig;
-
 if (process.env.DATABASE_URL) {
   console.log('Using DATABASE_URL for connection');
   const url = new URL(process.env.DATABASE_URL);
@@ -14,15 +12,22 @@ if (process.env.DATABASE_URL) {
     database: url.pathname.slice(1),
     port: url.port || 3306,
     ssl: {
-      rejectUnauthorized: true, // Secure connection
+      rejectUnauthorized: true,
     },
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
     charset: "utf8mb4",
+    // Add these connection management options
+    acquireTimeout: 60000,
+    timeout: 60000,
+    reconnect: true,
+    idleTimeout: 300000, // 5 minutes
+    // Handle connection errors
+    handleDisconnects: true
   };
 } else {
-  console.log('Using individual environment variables');
+   console.log('Using individual environment variables');
   dbConfig = {
     host: process.env.DB_HOST || "localhost",
     user: process.env.DB_USER || "root",
@@ -39,10 +44,12 @@ if (process.env.DATABASE_URL) {
 
 const pool = mysql.createPool(dbConfig);
 
-// Optional: log errors
+// Enhanced error handling
 pool.on("error", (err) => {
   console.error("MySQL Pool Error:", err);
+  if (err.code === 'PROTOCOL_CONNECTION_LOST' || err.code === 'ECONNRESET') {
+    console.log('Database connection lost, will reconnect on next query');
+  }
 });
 
 module.exports = pool.promise();
-
