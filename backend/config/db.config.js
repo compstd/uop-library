@@ -14,13 +14,11 @@ if (process.env.DATABASE_URL) {
     database: url.pathname.slice(1),
     port: url.port || 3306,
     ssl: {
-      rejectUnauthorized: false, // Try this if connection fails
+      rejectUnauthorized: true, // Secure connection
     },
     waitForConnections: true,
-    queueLimit: 0,
     connectionLimit: 10,
-    maxPreparedStatements: 100,
-    enableKeepAlive: true,
+    queueLimit: 0,
     charset: "utf8mb4",
   };
 } else {
@@ -33,24 +31,18 @@ if (process.env.DATABASE_URL) {
     port: process.env.DB_PORT || 3306,
     ssl: isProd ? { rejectUnauthorized: false } : false,
     waitForConnections: true,
-    queueLimit: 0,
     connectionLimit: 10,
-    maxPreparedStatements: 100,
-    enableKeepAlive: true,
+    queueLimit: 0,
     charset: "utf8mb4",
   };
 }
 
-const db = mysql.createPool(dbConfig);
+const pool = mysql.createPool(dbConfig);
 
-// Test connection
-db.getConnection((err, connection) => {
-  if (err) {
-    console.error('Database connection failed:', err);
-  } else {
-    console.log('Database connected successfully');
-    connection.release();
-  }
+// Optional: log errors
+pool.on("error", (err) => {
+  console.error("MySQL Pool Error:", err);
 });
 
-module.exports = db.promise();
+module.exports = pool.promise();
+
