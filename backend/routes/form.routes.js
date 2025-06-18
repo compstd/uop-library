@@ -89,6 +89,19 @@ router.post("/submit-form", uploadMemory.single("image"), async (req, res) => {
     }
   }
 });
+
+// Add this to your routes
+router.get("/health", async (req, res) => {
+  try {
+    const connection = await db.getConnection();
+    await connection.execute('SELECT 1 as health');
+    connection.release();
+    res.json({ status: "Database connected" });
+  } catch (error) {
+    console.error("Health check failed:", error);
+    res.status(500).json({ error: "Database connection failed" });
+  }
+});
 // GET /api/images
 router.get("/images", async (req, res) => {
   const query = "SELECT id, name, path FROM images WHERE 1";
