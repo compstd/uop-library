@@ -114,6 +114,21 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Add this to your main app file
+const keepAlive = async () => {
+  try {
+    const connection = await db.getConnection();
+    await connection.execute('SELECT 1');
+    connection.release();
+    console.log('Database keep-alive ping sent');
+  } catch (error) {
+    console.error('Keep-alive failed:', error);
+  }
+};
+
+// Ping every 4 minutes (PlanetScale typically idles after 5 minutes)
+setInterval(keepAlive, 4 * 60 * 1000);
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
