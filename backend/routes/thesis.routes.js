@@ -2,7 +2,7 @@ const express = require("express");
 const ExcelJS = require("exceljs");
 const db = require("../config/db.config");
 const router = express.Router();
-const uploadMemory = require("../config/multer.config2");
+const {uploadMemory} = require("../config/multer.config2");
 
 router.get("/download", async (req, res) => {
   console.log("Generating excel file...");
