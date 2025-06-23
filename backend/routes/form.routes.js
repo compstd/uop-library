@@ -1,7 +1,7 @@
 const express = require("express");
 const path = require("path");
 const db = require("../config/db.config.js");
-const uploadMemory = require("../config/multer.config2.js");
+const { uploadMemory, handleMulterError } = require("../config/multer.config2.js");
 
 const router = express.Router();
 
