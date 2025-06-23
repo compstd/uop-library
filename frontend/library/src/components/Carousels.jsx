@@ -22,7 +22,7 @@ export default function Carousels() {
   useEffect(() => {
     const fetchImages = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/events/img`);
+        const response = await axios.get(`${API_BASE_URL}/api/images`);
         setImages(response.data);
       } catch (err) {
         console.error("Error fetching images:", err);
