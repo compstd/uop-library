@@ -5,6 +5,9 @@ const path = require("path");
 const db = require("./config/db.config.js");
 require("dotenv").config();
 
+const { uploadMemory, handleMulterError } = require("./config/multer.config2.js");
+
+
 // Define isProduction at the top
 const isProduction = process.env.NODE_ENV === 'production';
 
