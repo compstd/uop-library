@@ -134,6 +134,11 @@ app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
+app.post('/api/test-connection', (req, res) => {
+  res.status(200).json({ success: true, message: "Frontend and backend are connected!" });
+});
+
+
 // Start server
 app.listen(port, "0.0.0.0", () => {
   console.log(
