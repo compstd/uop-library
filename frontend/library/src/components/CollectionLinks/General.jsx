@@ -1,6 +1,32 @@
+import { useEffect } from "react";
+import axios from "axios";
 import { Col } from "react-bootstrap";
 import Table from "react-bootstrap/Table";
+
 export default function General() {
+  useEffect(() => {
+    const testConnection = async () => {
+      try {
+        const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+        const response = await axios.post(
+          `${API_BASE_URL}/api/test-connection`,
+          {},
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        );
+        console.log("Backend Connection Successful:", response.data);
+      } catch (error) {
+        console.error("Backend Connection Failed:", error);
+      }
+    };
+
+    testConnection();
+  }, []);
+
   return (
     <Col md={8} sm={12} className="collection">
       <p>
