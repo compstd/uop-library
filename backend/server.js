@@ -129,13 +129,14 @@ const keepAlive = async () => {
 // Ping every 4 minutes (PlanetScale typically idles after 5 minutes)
 setInterval(keepAlive, 4 * 60 * 1000);
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ message: "Route not found" });
-});
 
 app.post('/api/test-connection', (req, res) => {
   res.status(200).json({ success: true, message: "Frontend and backend are connected!" });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ message: "Route not found" });
 });
 
 
