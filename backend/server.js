@@ -27,7 +27,6 @@ const authRoutes = require("./routes/auth.routes");
 const studentRoutes = require("./routes/student.routes");
 const resourceRoutes = require("./routes/resource.routes");
 const eventRoutes = require("./routes/event.routes");
-const uploadMemory = require("./config/multer.config2.js");
 const thesisRoutes = require("./routes/thesis.routes");
 const basicRoutes = require("./routes/basic.routes.js");
 const formRoutes = require("./routes/form.routes");
