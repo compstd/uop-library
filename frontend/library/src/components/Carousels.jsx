@@ -24,6 +24,7 @@ export default function Carousels() {
       try {
         const response = await axios.get(`${API_BASE_URL}/api/images`);
         setImages(response.data);
+        console.log(response.data);
       } catch (err) {
         console.error("Error fetching images:", err);
       }
