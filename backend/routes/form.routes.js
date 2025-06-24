@@ -81,17 +81,19 @@ router.get("/health", async (req, res) => {
     res.status(500).json({ error: "Database connection failed" });
   }
 });
-// GET /api/images
+
 router.get("/images", async (req, res) => {
-  const query = "SELECT id, name, path FROM images WHERE 1";
+  const query = "SELECT id, name, path FROM images";
 
   try {
     const [results] = await db.execute(query);
+
     const images = results.map((img) => ({
       id: img.id,
       name: img.name,
-      path: `/uploads/${path.basename(img.path.toString())}`,
+      url: img.path, // Cloudinary URL already stored in DB
     }));
+
     res.json(images);
   } catch (err) {
     console.error("Error fetching images:", err);
