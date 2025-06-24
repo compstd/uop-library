@@ -15,17 +15,11 @@ router.post(
     } = req.body;
 
     let imageUrl = null;
-    if (req.file) {
-      // upload to Cloudinary via stream
-      imageUrl = await new Promise((resolve, reject) => {
-        cloudinary.uploader
-          .upload_stream({ folder: "students" }, (err, result) => {
-            if (err) return reject(err);
-            resolve(result.secure_url);
-          })
-          .end(req.file.buffer);
-      });
-    }
+ if (req.file) {
+  // returns the full result object; grab secure_url
+  const result = await uploadToCloudinary(req.file.buffer, "students");
+  imageUrl = result.secure_url;
+}
 
     let conn;
     try {
