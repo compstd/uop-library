@@ -91,7 +91,7 @@ function Events() {
                   </Col>
                   <Col md={8}>
                     <Card.Body>
-                      <small className="text-muted">Updated 1 week ago</small>
+                      <small className="text-muted">Be part of this event.</small>
                       <Card.Title>{event.title}</Card.Title>
                       <Card.Text>
                         {event.caption} <br />
