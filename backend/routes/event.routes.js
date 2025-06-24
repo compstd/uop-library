@@ -1,8 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../config/db.config");
-const upload = require("../config/multer.config");
+const { uploadToCloudinary } = require("../config/cloudinary.config");
+const { uploadMemory } = require("../config/multer.config2");
 
+// Get all events
 router.get("/", async (req, res) => {
   try {
     const [results] = await db.execute("SELECT * FROM events");
@@ -13,68 +15,59 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/img", upload.single("image"), async (req, res) => {
-  const imgPath = req.file.path;
-  const imgName = req.file.filename;
-
-  const query = "INSERT INTO images (name, path) VALUES (?, ?)";
+// Upload image and save in images table
+router.post("/img", uploadMemory.single("image"), async (req, res) => {
   try {
-    await db.execute(query, [imgName, imgPath]);
+    if (!req.file) {
+      return res.status(400).send("No image file uploaded");
+    }
+
+    const result = await uploadToCloudinary(req.file.buffer, "images");
+
+    const query = "INSERT INTO images (name, path) VALUES (?, ?)";
+    await db.execute(query, [result.original_filename, result.secure_url]);
+
     res.send("Image uploaded successfully");
   } catch (err) {
-    console.error("Error uploading image:", err);
+    console.error("Error uploading image to Cloudinary:", err);
     res.status(500).send("Error uploading image");
   }
 });
 
-router.post("/img", upload.single("image"), async (req, res) => {
-  const imgName = req.file.filename;
-  const imgPath = `/uploads/${imgName}`; // ✅ Only relative path
-
-  const query = "INSERT INTO images (name, path) VALUES (?, ?)";
-  try {
-    await db.execute(query, [imgName, imgPath]);
-    res.send("Image uploaded successfully");
-  } catch (err) {
-    console.error("Error uploading image:", err);
-    res.status(500).send("Error uploading image");
-  }
-});
-
-
-router.post("/", upload.single("image"), async (req, res) => {
+// Create a new event with Cloudinary image
+router.post("/", uploadMemory.single("image"), async (req, res) => {
   const { title, description, time, date } = req.body;
-  const relativePath = req.file ? `/uploads/${req.file.filename}` : null;
 
-  const query =
-    "INSERT INTO `events`(`title`, `caption`, `event_img`, `TIME`, `DATE`) VALUES (?, ?, ?, ?, ?)";
   try {
-    const [result] = await db.execute(query, [
+    let imageUrl = null;
+
+    if (req.file) {
+      const result = await uploadToCloudinary(req.file.buffer, "events");
+      imageUrl = result.secure_url;
+    }
+
+    const query =
+      "INSERT INTO events (title, caption, event_img, TIME, DATE) VALUES (?, ?, ?, ?, ?)";
+    const [dbResult] = await db.execute(query, [
       title,
       description,
-      relativePath,
+      imageUrl,
       time,
       date,
     ]);
-    res.json({ ...result, imagePath: relativePath });
+
+    res.json({ ...dbResult, imageUrl });
   } catch (err) {
-    console.error("Error inserting data:", err);
+    console.error("Error inserting event:", err);
     res.status(500).json({ error: "Database insert error" });
   }
 });
 
+// Get events (no /uploads path needed)
 router.get("/events", async (req, res) => {
-  const query = "SELECT * FROM events";
-
   try {
-    const [result] = await db.execute(query);
-    const processedEvents = result.map((event) => ({
-      ...event,
-      event_img: event.event_img
-        ? `/uploads/${path.basename(event.event_img)}`
-        : null,
-    }));
-    res.json(processedEvents);
+    const [result] = await db.execute("SELECT * FROM events");
+    res.json(result); // event_img is already a Cloudinary URL
   } catch (err) {
     console.error("Error fetching events:", err);
     res.status(500).json({ error: "Internal server error" });
