@@ -1,96 +1,75 @@
 const express = require("express");
-const path = require("path");
-const db = require("../config/db.config.js");
-const { uploadMemory, handleMulterError } = require("../config/multer.config2.js");
+const db      = require("../config/db.config.js");
+const { uploadMemory } = require("../config/multer.config2.js");
+const cloudinary = require("../config/cloudinary.config.js");
+const router  = express.Router();
 
-const router = express.Router();
+router.post(
+  "/submit-form",
+  uploadMemory.single("image"),
+  async (req, res) => {
+    const {
+      fname, lname, fathername, department, semester,
+      PAddress, email, phone, nic, dob, status,
+      designation, issue, expire,
+    } = req.body;
 
-// POST /api/submit-form
-router.post("/submit-form", uploadMemory.single("image"), async (req, res) => {
-  const {
-    fname, lname, fathername, department, semester, PAddress,
-    email, phone, nic, dob, status, designation, issue, expire,
-  } = req.body;
-  
-  const image = req.file ? req.file.buffer : null;
-  
-  let connection;
-  let retries = 3;
-  
-  while (retries > 0) {
+    let imageUrl = null;
+    if (req.file) {
+      // upload to Cloudinary via stream
+      imageUrl = await new Promise((resolve, reject) => {
+        cloudinary.uploader
+          .upload_stream({ folder: "students" }, (err, result) => {
+            if (err) return reject(err);
+            resolve(result.secure_url);
+          })
+          .end(req.file.buffer);
+      });
+    }
+
+    let conn;
     try {
-      connection = await db.getConnection();
-      
-      // Test the connection first
-      await connection.execute('SELECT 1');
-      
-      await connection.beginTransaction();
-      
-      const [studentResult] = await connection.execute(
-        `INSERT INTO students 
-        (first_name, last_name, father_name, cnic, dob, phone, email, address, type, status, image) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [fname, lname, fathername, nic, dob, phone, email, PAddress, designation, status, image]
+      conn = await db.getConnection();
+      await conn.beginTransaction();
+
+      // Save the URL string instead of blob
+      const [r] = await conn.execute(
+        `INSERT INTO students
+         (first_name, last_name, father_name,
+          cnic, dob, phone, email, address,
+          type, status, image_url)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [fname, lname, fathername,
+         nic, dob, phone, email, PAddress,
+         designation, status, imageUrl]
       );
-      
-      const studentId = studentResult.insertId;
-      
-      await connection.execute(
-        "INSERT INTO student_programs (student_id, program, semester) VALUES (?, ?, ?)",
+      const studentId = r.insertId;
+
+      await conn.execute(
+        `INSERT INTO student_programs
+         (student_id, program, semester)
+         VALUES (?, ?, ?)`,
         [studentId, department, semester]
       );
-      
-      await connection.execute(
-        "INSERT INTO card_table (student_id, issue_date, expirey_date) VALUES (?, ?, ?)",
+      await conn.execute(
+        `INSERT INTO card_table
+         (student_id, issue_date, expirey_date)
+         VALUES (?, ?, ?)`,
         [studentId, issue, expire]
       );
-      
-      await connection.commit();
-      res.json({ message: "Form submitted successfully" });
-      break; // Success, exit retry loop
-      
-    } catch (error) {
-      console.error(`❌ Error submitting form (attempt ${4 - retries}):`, error);
-      
-      if (connection) {
-        try {
-          await connection.rollback();
-        } catch (rollbackError) {
-          console.error("Rollback error:", rollbackError);
-        }
-      }
-      
-      // Check if it's a connection-related error
-      if (error.code === 'PROTOCOL_CONNECTION_LOST' || 
-          error.code === 'ECONNRESET' || 
-          error.code === 'ER_SERVER_SHUTDOWN' ||
-          error.message.includes('Connection lost')) {
-        
-        retries--;
-        if (retries > 0) {
-          console.log(`Retrying connection... ${retries} attempts remaining`);
-          await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
-          continue;
-        }
-      } else {
-        // Non-connection error, don't retry
-        retries = 0;
-      }
-      
-      if (retries === 0) {
-        res.status(500).json({ 
-          error: "Database connection failed. Please try again later." 
-        });
-      }
+
+      await conn.commit();
+      return res.json({ message: "Form submitted successfully" });
+    } catch (err) {
+      if (conn) await conn.rollback();
+      console.error(err);
+      return res.status(500).json({ error: "Upload failed, please try again." });
     } finally {
-      if (connection) {
-        connection.release();
-      }
+      if (conn) conn.release();
     }
   }
-});
+);
 
-// Add this to your routes
 router.get("/health", async (req, res) => {
   try {
     const connection = await db.getConnection();
