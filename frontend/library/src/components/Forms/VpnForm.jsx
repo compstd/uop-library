@@ -74,12 +74,16 @@ export default function VpnForm() {
   });
 
   const onSubmit = async (data) => {
-    try {
-      await axios.post("http://localhost:4000/resources/insertResource", data);
-      setIsModalVisible(true);
-    } catch (error) {
-      console.log("Error something form", error);
-    }
+   try {
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
+  await axios.post(`${API_BASE_URL}/resources/insertResource`, data);
+
+  setIsModalVisible(true);
+} catch (error) {
+  console.error("Error inserting resource:", error);
+}
+
   };
   return (
     <>
