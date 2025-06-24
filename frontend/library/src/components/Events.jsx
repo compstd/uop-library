@@ -84,7 +84,7 @@ function Events() {
                 <Row className="g-0">
                   <Col md={4}>
                     <Card.Img
-                      src={`${baseURL}${event.event_img}`}
+                      src={event.event_img}
                       alt={event.title}
                       className="img-fluid rounded-start"
                     />
