@@ -5,7 +5,7 @@ const path = require("path");
 const db = require("./config/db.config.js");
 require("dotenv").config();
 
-const { uploadMemory, handleMulterError } = require("./config/multer.config2.js");
+const { uploadMemory } = require("./config/multer.config2.js");
 
 
 // Define isProduction at the top
@@ -58,8 +58,6 @@ app.options('*', cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // Add this for form data
 app.use(cookieParser());
-app.use(handleMulterError);
-
 
 // Static files
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
