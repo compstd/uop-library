@@ -1,7 +1,7 @@
 const express = require("express");
 const db      = require("../config/db.config.js");
 const { uploadMemory } = require("../config/multer.config2.js");
-const cloudinary = require("../config/cloudinary.config.js");
+const { uploadToCloudinary } = require("../config/cloudinary.config.js");
 const router  = express.Router();
 
 router.post(
