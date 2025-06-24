@@ -37,7 +37,7 @@ router.post(
         `INSERT INTO students
          (first_name, last_name, father_name,
           cnic, dob, phone, email, address,
-          type, status, image_url)
+          type, status, image)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [fname, lname, fathername,
          nic, dob, phone, email, PAddress,
