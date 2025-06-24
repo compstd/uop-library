@@ -98,16 +98,20 @@ export default function BookPurchase() {
     },
   });
 
-  const onSubmit = async (data) => {
-     const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
-    
+const onSubmit = async (data) => {
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
+  try {
     const response = await axios.post(
-      `${API_BASE_URL}/resources/insertPurchase`, data);
-      setIsModalVisible(true);
-    } catch (error) {
-      console.log("error in data purchase table", error);
-    }
-  };
+      `${API_BASE_URL}/resources/insertPurchase`,
+      data
+    );
+    setIsModalVisible(true);
+  } catch (error) {
+    console.log("error in data purchase table", error);
+  }
+};
+
   return (
     <>
       <h4 style={{ marginTop: "19px", marginBottom: "58px" }}>
