@@ -99,8 +99,10 @@ export default function BookPurchase() {
   });
 
   const onSubmit = async (data) => {
-    try {
-      await axios.post("http://localhost:4000/resources/insertPurchase", data);
+     const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+    
+    const response = await axios.post(
+      `${API_BASE_URL}/resources/insertPurchase`, data);
       setIsModalVisible(true);
     } catch (error) {
       console.log("error in data purchase table", error);
