@@ -1,8 +1,43 @@
+// image route
 const express = require("express");
 const router = express.Router();
 const db = require("../config/db.config");
 const { uploadToCloudinary } = require("../config/cloudinary.config");
 const { uploadMemory } = require("../config/multer.config2");
+
+router.post("/img", uploadMemory.single("image"), async (req, res) => {
+  try {
+    console.log("File received:", req.file ? "Yes" : "No");
+    
+    if (!req.file) {
+      return res.status(400).json({ error: "No image file uploaded" });
+    }
+
+    console.log("Uploading to Cloudinary...");
+    const result = await uploadToCloudinary(req.file.buffer, "images");
+    console.log("Cloudinary upload result:", result.secure_url);
+
+    // Use the original filename from multer or a generated name
+    const filename = req.file.originalname || result.public_id;
+    
+    const query = "INSERT INTO images (name, path) VALUES (?, ?)";
+    await db.execute(query, [filename, result.secure_url]);
+    
+    console.log("Database insert successful");
+    res.json({ 
+      message: "Image uploaded successfully", 
+      url: result.secure_url,
+      filename: filename
+    });
+    
+  } catch (err) {
+    console.error("Error uploading image:", err);
+    res.status(500).json({ 
+      error: "Error uploading image", 
+      details: err.message 
+    });
+  }
+});
 
 // Get all events
 router.get("/", async (req, res) => {
@@ -12,25 +47,6 @@ router.get("/", async (req, res) => {
   } catch (err) {
     console.error("Error fetching events:", err);
     res.status(500).json({ error: "Database fetch error" });
-  }
-});
-
-// Upload image and save in images table
-router.post("/img", uploadMemory.single("image"), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).send("No image file uploaded");
-    }
-
-    const result = await uploadToCloudinary(req.file.buffer, "images");
-
-    const query = "INSERT INTO images (name, path) VALUES (?, ?)";
-    await db.execute(query, [result.original_filename, result.secure_url]);
-
-    res.send("Image uploaded successfully");
-  } catch (err) {
-    console.error("Error uploading image to Cloudinary:", err);
-    res.status(500).send("Error uploading image");
   }
 });
 
